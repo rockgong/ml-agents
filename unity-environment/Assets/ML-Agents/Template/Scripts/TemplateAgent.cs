@@ -5,6 +5,7 @@ using System.Text;
 
 public class TemplateAgent : Agent {
 	public SpaceshipController spaceShip;
+	public RoadModelBuilder roadBuilder;
 	public Transform goalTrans;
 
 	public override List<float> CollectState()
@@ -56,6 +57,18 @@ public class TemplateAgent : Agent {
 			spaceShip.transform.rotation = Quaternion.identity;
 			spaceShip.goal = false;
 			spaceShip.Stop();
+		}
+
+		if (roadBuilder != null)
+		{
+			List<RoadModelBuilder.Command> commandList = new List<RoadModelBuilder.Command>();
+			commandList.Add(new RoadModelBuilder.Command(0, 10));
+			commandList.Add(new RoadModelBuilder.Command(1, 10));
+			commandList.Add(new RoadModelBuilder.Command(0, -20));
+			commandList.Add(new RoadModelBuilder.Command(1, 10));
+			commandList.Add(new RoadModelBuilder.Command(0, -20));
+			commandList.Add(new RoadModelBuilder.Command(1, 30));
+			roadBuilder.Build(commandList);
 		}
 	}
 
