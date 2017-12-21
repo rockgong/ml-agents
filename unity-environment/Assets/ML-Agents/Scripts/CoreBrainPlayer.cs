@@ -91,8 +91,8 @@ public class CoreBrainPlayer : ScriptableObject, CoreBrain
             {
                 if (Input.GetKey(dha.key))
                 {
-                    action[0] = (float)dha.value;
-                    break;
+                    action[0] += (float)dha.value;
+                    // break;
                 }
             }
             Dictionary<int, float[]> actions = new Dictionary<int, float[]>();
