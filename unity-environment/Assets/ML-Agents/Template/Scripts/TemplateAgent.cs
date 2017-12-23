@@ -8,6 +8,12 @@ public class TemplateAgent : Agent {
 	public RoadModelBuilder roadBuilder;
 	public Transform goalTrans;
 
+	public float roadLength = 100.0f;
+	public float minRoadSegmentLength = 10.0f;
+	public float maxRoadSegmentLength = 80.0f;
+	public float minRoadRadius = 12.0f;
+	public float maxRoadRadius = 30.0f;
+
 	public override List<float> CollectState()
 	{
 		List<float> state = new List<float>();
@@ -62,14 +68,8 @@ public class TemplateAgent : Agent {
 		if (roadBuilder != null)
 		{
 			List<RoadModelBuilder.Command> commandList = new List<RoadModelBuilder.Command>();
-			commandList.Add(new RoadModelBuilder.Command(0, 10));
-			commandList.Add(new RoadModelBuilder.Command(1, 10));
-			commandList.Add(new RoadModelBuilder.Command(0, -20));
-			commandList.Add(new RoadModelBuilder.Command(1, 10));
-			commandList.Add(new RoadModelBuilder.Command(0, -20));
-			commandList.Add(new RoadModelBuilder.Command(1, 30));
-			commandList.Add(new RoadModelBuilder.Command(0, 20));
-			commandList.Add(new RoadModelBuilder.Command(1, 30));
+			foreach(RoadModelBuilder.Command cmd in RoadModelBuilderCommandGenerate(roadLength, minRoadSegmentLength, maxRoadSegmentLength, minRoadRadius, maxRoadRadius))
+				commandList.Add(cmd);
 			roadBuilder.Build(commandList, (x, y, ga) =>
 			{
 				goalTrans.position = new Vector3(x, 0.0f, y);
@@ -81,6 +81,26 @@ public class TemplateAgent : Agent {
 	public override void AgentOnDone()
 	{
 
+	}
+
+	public IEnumerable<RoadModelBuilder.Command> RoadModelBuilderCommandGenerate(float totalLength, float minSegLength, float maxSegLength, float minRadius, float maxRadius)
+	{
+		float length = totalLength;
+		float curT = 0.0f;
+		float cnt = Random.value > 0.5f ? 1 : 0;
+		while(true)
+		{
+			float curDeltaT = (cnt % 2 == 0 ? 1.0f : -1.0f) * (Random.value * (maxRadius - minRadius) + minRadius) - curT;
+			curT += curDeltaT;
+			cnt++;
+			yield return new RoadModelBuilder.Command(0, curDeltaT);
+			float curLength = Random.value * (maxSegLength - minSegLength) + minSegLength;
+			if (length <= curLength)
+				break;
+			length -= curLength;
+			yield return new RoadModelBuilder.Command(1, curLength);
+		}
+		yield return new RoadModelBuilder.Command(1, length);
 	}
 
 	void OnGUI()

@@ -112,6 +112,47 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &134311801
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 134311803}
+  - component: {fileID: 134311802}
+  m_Layer: 0
+  m_Name: CameraLootTarget
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &134311802
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 134311801}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ca2a5ccecec8c84394d4597b7e672e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  roadModelBuilder: {fileID: 794363540}
+--- !u!4 &134311803
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 134311801}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &439010355
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -291,10 +332,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 833208a901791524b9a2a73c1dbdbf65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  roadWidth: 4
+  roadWidth: 6
   roadHeight: 2
-  roadThickness: 0.5
-  stepLength: 1
+  roadThickness: 1
+  stepLength: 3
 --- !u!4 &794363541
 Transform:
   m_ObjectHideFlags: 0
@@ -530,6 +571,11 @@ MonoBehaviour:
   spaceShip: {fileID: 1653672404}
   roadBuilder: {fileID: 794363540}
   goalTrans: {fileID: 1205672327}
+  roadLength: 90
+  minRoadSegmentLength: 15
+  maxRoadSegmentLength: 50
+  minRoadRadius: 12
+  maxRoadRadius: 30
 --- !u!4 &1223085757
 Transform:
   m_ObjectHideFlags: 0
@@ -667,6 +713,11 @@ Prefab:
       propertyPath: m_RootOrder
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114482697761310880, guid: 179c84d25a2f1464b925c1ef2cb43ed3,
+        type: 2}
+      propertyPath: accelerate
+      value: 20
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 179c84d25a2f1464b925c1ef2cb43ed3, type: 2}
   m_IsPrefabParent: 0
@@ -730,7 +781,7 @@ Camera:
   m_GameObject: {fileID: 1715640920}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 2
+  m_ClearFlags: 1
   m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_NormalizedViewPortRect:
     serializedVersion: 2
@@ -740,7 +791,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 45
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -781,5 +832,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d867f2d2e814512468ac6d2b987683aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  followTarget: {fileID: 1653672405}
-  followOffset: {x: 0, y: 30, z: -1}
+  followTarget: {fileID: 134311803}
+  followOffset: {x: 0, y: 100, z: -10}

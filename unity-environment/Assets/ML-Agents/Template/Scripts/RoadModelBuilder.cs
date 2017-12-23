@@ -25,6 +25,8 @@ public class RoadModelBuilder : MonoBehaviour {
 	public float roadHeight = 2.0f;
 	public float roadThickness = 0.5f;
 	public float stepLength = 0.2f;
+
+	private Vector3 _center = Vector3.zero;
 	// Use this for initialization
 	void Start () {
 		_mesh = GetComponent<MeshFilter>().mesh;
@@ -77,6 +79,12 @@ public class RoadModelBuilder : MonoBehaviour {
 		List<int> col0TriList = new List<int>();
 		List<int> col1TriList = new List<int>();
 		int groupCount = -1;
+		float minX = 0.0f,
+			maxX = 0.0f,
+			minY = 0.0f,
+			maxY = 0.0f,
+			minZ = 0.0f,
+			maxZ = 0.0f;
 		pointBuilder.ForEachRoadPoint((p0, p1) =>
 		{
 			Vector3 orient = (new Vector3(p1.x - p0.x, 0.0f, p1.y - p0.y)).normalized;
@@ -89,6 +97,32 @@ public class RoadModelBuilder : MonoBehaviour {
 			Vector3 v5 = v3 + orient * roadThickness;
 			Vector3 v6 = v4 - Vector3.up * (roadHeight + roadThickness);
 			Vector3 v7 = v5 - Vector3.up * (roadHeight + roadThickness);
+
+			float[] xs = new float[]{v0.x, v1.x, v2.x, v3.x, v4.x, v5.x, v6.x, v7.x};
+			float[] ys = new float[]{v0.y, v1.y, v2.y, v3.y, v4.y, v5.y, v6.y, v7.y};
+			float[] zs = new float[]{v0.z, v1.z, v2.z, v3.z, v4.z, v5.z, v6.z, v7.z};
+
+			for (int i = 0, n = xs.Length; i < n; i++)
+			{
+				if (xs[i] < minX)
+					minX = xs[i];
+				if (xs[i] > maxX)
+					maxX = xs[i];
+			}
+			for (int i = 0, n = ys.Length; i < n; i++)
+			{
+				if (ys[i] < minY)
+					minY = ys[i];
+				if (ys[i] > maxY)
+					maxY = ys[i];
+			}
+			for (int i = 0, n = zs.Length; i < n; i++)
+			{
+				if (zs[i] < minZ)
+					minZ = zs[i];
+				if (zs[i] > maxZ)
+					maxZ = zs[i];
+			}
 
 			vertList.Add(v0);
 			vertList.Add(v1);
@@ -225,8 +259,12 @@ public class RoadModelBuilder : MonoBehaviour {
 
 			groupCount ++;
 		});
+		_center = new Vector3((minX + maxX) / 2, (minY + maxY) / 2, (minZ + maxZ) / 2);
+		_mesh.triangles = new int[0];
 		_mesh.vertices = vertList.ToArray();
 		_mesh.triangles = triList.ToArray();
+		_colliderMesh0.triangles = new int[0];
+		_colliderMesh1.triangles = new int[0];
 		_colliderMesh0.vertices = col0VertList.ToArray();
 		_colliderMesh1.vertices = col1VertList.ToArray();
 		_colliderMesh0.triangles = col0TriList.ToArray();
@@ -239,5 +277,10 @@ public class RoadModelBuilder : MonoBehaviour {
 
 		if (onEnd != null)
 			onEnd(endX, endY, endGA);
+	}
+
+	public Vector3 GetBoundsCenter()
+	{
+		return _center;
 	}
 }

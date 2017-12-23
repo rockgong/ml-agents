@@ -95,7 +95,6 @@ public class RoadPointBuilder
 
 		public void ChangeAngle(float deltaAngle)
 		{
-			Debug.Log(string.Format("delta angle : {0}", deltaAngle));
 			gradientAngle += deltaAngle;
 		}
 
