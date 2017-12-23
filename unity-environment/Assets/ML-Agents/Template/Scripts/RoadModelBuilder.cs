@@ -50,17 +50,25 @@ public class RoadModelBuilder : MonoBehaviour {
 		_colliderMesh1.name = "Col1Mesh";
 	}
 
-	public void Build(List<Command> commands)
+	public void Build(List<Command> commands, System.Action<float, float, float> onEnd = null)
 	{
 		RoadPointBuilder pointBuilder = new RoadPointBuilder(0.0f, 0.0f, 0.0f, -roadWidth / 2, roadWidth / 2, stepLength);
 
+		float endX = 0.0f, endY = 0.0f, endGA = 0.0f;
+
 		for (int i = 0, n = commands.Count; i < n; i++)
 		{
+
 			if (commands[i].t == 0)
 				pointBuilder.ChangePivot(commands[i].v);
 			else if (commands[i].t == 1)
 				pointBuilder.BuildDistance(commands[i].v);
 		}
+		pointBuilder.QueryCursorState((x, y, ga, c0, c1) =>
+		{
+			pointBuilder.GetCursorMiddlePoint(out endX, out endY);
+			endGA = ga;
+		});
 
 		List<Vector3> vertList = new List<Vector3>();
 		List<Vector3> col0VertList = new List<Vector3>();
@@ -228,5 +236,8 @@ public class RoadModelBuilder : MonoBehaviour {
 		_colliderMesh1.RecalculateNormals();
 		_meshCol0.sharedMesh = _colliderMesh0;
 		_meshCol1.sharedMesh = _colliderMesh1;
+
+		if (onEnd != null)
+			onEnd(endX, endY, endGA);
 	}
 }

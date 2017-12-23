@@ -115,6 +115,11 @@ public class RoadPointBuilder
 			cursor0 -= t;
 			cursor1 -= t;
 		}
+
+		public void GetMiddlePoint(out float x, out float y)
+		{
+			GetPoint((cursor0 + cursor1) / 2, out x, out y);
+		}
 	}
 
 	private CursorLine _cursorLine = null;
@@ -187,5 +192,10 @@ public class RoadPointBuilder
 				return i / 2;
 		}
 		return -1;
+	}
+
+	public void GetCursorMiddlePoint(out float x, out float y)
+	{
+		_cursorLine.GetMiddlePoint(out x, out y);
 	}
 }

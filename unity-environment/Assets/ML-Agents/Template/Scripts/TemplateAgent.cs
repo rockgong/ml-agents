@@ -68,7 +68,13 @@ public class TemplateAgent : Agent {
 			commandList.Add(new RoadModelBuilder.Command(1, 10));
 			commandList.Add(new RoadModelBuilder.Command(0, -20));
 			commandList.Add(new RoadModelBuilder.Command(1, 30));
-			roadBuilder.Build(commandList);
+			commandList.Add(new RoadModelBuilder.Command(0, 20));
+			commandList.Add(new RoadModelBuilder.Command(1, 30));
+			roadBuilder.Build(commandList, (x, y, ga) =>
+			{
+				goalTrans.position = new Vector3(x, 0.0f, y);
+				goalTrans.rotation = Quaternion.Euler(0.0f, -ga / Mathf.PI * 180.0f, 0.0f);
+			});
 		}
 	}
 
