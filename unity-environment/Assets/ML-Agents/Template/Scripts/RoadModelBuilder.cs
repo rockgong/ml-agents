@@ -27,6 +27,7 @@ public class RoadModelBuilder : MonoBehaviour {
 	public float stepLength = 0.2f;
 
 	private Vector3 _center = Vector3.zero;
+	private RoadPointBuilder _currentBuilder;
 	// Use this for initialization
 	void Start () {
 		_mesh = GetComponent<MeshFilter>().mesh;
@@ -274,6 +275,7 @@ public class RoadModelBuilder : MonoBehaviour {
 		_colliderMesh1.RecalculateNormals();
 		_meshCol0.sharedMesh = _colliderMesh0;
 		_meshCol1.sharedMesh = _colliderMesh1;
+		_currentBuilder = pointBuilder;
 
 		if (onEnd != null)
 			onEnd(endX, endY, endGA);
@@ -282,5 +284,16 @@ public class RoadModelBuilder : MonoBehaviour {
 	public Vector3 GetBoundsCenter()
 	{
 		return _center;
+	}
+
+	public void QueryProgress(float x, float y, System.Action<int, int> cb)
+	{
+		if (_currentBuilder != null)
+		{
+			int insectBlockIndex = _currentBuilder.GetInsectBlock(x, y);
+			int totalBlockCount = _currentBuilder.GetBlockCount();
+			if (cb != null)
+				cb(insectBlockIndex, totalBlockCount);
+		}
 	}
 }
