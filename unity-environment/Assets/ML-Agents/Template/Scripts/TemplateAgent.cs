@@ -15,39 +15,87 @@ public class TemplateAgent : Agent {
 	public float maxRoadRadius = 30.0f;
 	public float detectStep = 1.0f;
 	public int detectCount = 5;
+	public float detectAngleStep = 1.0f;
+	public float turnThreshold = 0.2f;
 
 	private int processBlock;
 	private int totalBlock;
 	private int processBlockLastStep;
 
-	private float[] _detection = null;
+	private float detection0 = 0.0f;
+	private float dirDetection = 0.0f;
+	private float dirDetectionLeft = 0.0f;
+	private float dirDetectionRight = 0.0f;
 
-	public override List<float> CollectState()
+	private float[] _currentDetection = null;
+
+	private float GetDirDetection(float baseX, float baseY, float forwardX, float forwardY)
 	{
-		if (_detection == null)
-			_detection = new float[detectCount];
-		float pX = spaceShip.transform.position.x;
-		float pY = spaceShip.transform.position.z;
-		float fX = spaceShip.transform.forward.x;
-		float fY = spaceShip.transform.forward.z;
+		if (_currentDetection == null)
+			_currentDetection = new float[detectCount];
+		float pX = baseX;
+		float pY = baseY;
 		for (int i = 0; i < detectCount; i++)
 		{
 			roadBuilder.QueryProgress(pX, pY, (p, c) =>
 			{
-				_detection[i] = (float)p / c;
+				_currentDetection[i] = (float)p / c;
 			});
-			pX += fX * detectStep;
-			pY += fY * detectStep;
+			pX += forwardX * detectStep;
+			pY += forwardY * detectStep;
 		}
 
-		List<float> state = new List<float>();
-		state.Add(spaceShip.transform.position.x);
-		state.Add(spaceShip.transform.position.z);
+		float result = 0.0f;
 		for (int i = 0; i < detectCount; i++)
 		{
-			state.Add(_detection[i]);
-			Monitor.Log(string.Format("Detection_{0}", i), _detection[i].ToString());
+			if (_currentDetection[i] >= 0.0f)
+				result += _currentDetection[i] - _currentDetection[0];
+			else
+				break;
 		}
+
+		return result;
+	}
+
+	private float DetectOneHandSide(float baseX, float baseY, float startForwardX, float startForwardY, float angleStep, int count)
+	{
+		float result = -99999999.0f;
+		Quaternion rotationStep = Quaternion.Euler(0.0f, angleStep, 0.0f);
+		Vector3 curDir = new Vector3(startForwardX, 0.0f, startForwardY);
+		for (int i = 0; i < count; i++)
+		{
+			curDir = rotationStep * curDir;
+			float stepResult = GetDirDetection(baseX, baseY, curDir.x, curDir.z);
+			if (stepResult > result)
+				result = stepResult;
+		}
+		return result;
+	}
+
+	public override List<float> CollectState()
+	{
+		List<float> state = new List<float>();
+		float pX = spaceShip.transform.position.x;
+		float pY = spaceShip.transform.position.z;
+		roadBuilder.QueryProgress(pX, pY, (p, c) =>
+		{
+			detection0 = (float)p / c;
+		});
+		float fX = spaceShip.transform.forward.x;
+		float fY = spaceShip.transform.forward.z;
+
+		dirDetection = GetDirDetection(pX, pY, fX, fY);
+		state.Add(dirDetection);
+		Monitor.Log("DirDect", dirDetection.ToString());
+
+		int detectStepCount = (int)(180.0f / detectAngleStep) + 1;
+		dirDetectionLeft = DetectOneHandSide(pX, pY, fX, fY, -detectAngleStep, detectCount);
+		dirDetectionRight = DetectOneHandSide(pX, pY, fX, fY, detectAngleStep, detectCount);
+		state.Add(dirDetectionLeft);
+		Monitor.Log("DirDectL", dirDetectionLeft.ToString());
+		state.Add(dirDetectionRight);
+		Monitor.Log("DirDectR", dirDetectionRight.ToString());
+
 		state.Add(spaceShip.GetVelocity().x);
 		state.Add(spaceShip.GetVelocity().z);
 		state.Add(Mathf.Sin(spaceShip.GetYaw()));
@@ -74,39 +122,37 @@ public class TemplateAgent : Agent {
 
 		done = spaceShip != null ? spaceShip.goal : false;
 		reward = 0.0f;
-		float rewardPerProcess = 1.0f / detectCount;
-		for (int i = 1; i < detectCount; i++)
+		if (dirDetection > 0.0f && dirDetection + turnThreshold >= dirDetectionLeft && dirDetection + turnThreshold >= dirDetectionRight)
 		{
-			if (_detection[i] == _detection[0])
-				continue;
-
-			if (_detection[i] > _detection[0])
+			if (turnDir == 0)
+				reward += 0.5f;
+		}
+		else
+		{
+			if (dirDetectionLeft > dirDetectionRight)
 			{
-				if (boost)
-					reward = 0.9f;
-				else
-					reward = 0.5f;
-				break;
+				if (turnDir == -1)
+					reward += 0.1f;
+				else if (turnDir == 1)
+					reward -= 0.5f;
 			}
 			else
 			{
-				if (boost)
-					reward = -0.1f;
-				else
-					reward = 0.3f;
-				break;
+				if (turnDir == 1)
+					reward += 0.1f;
+				else if (turnDir == -1)
+					reward -= 0.5f;
 			}
 		}
-		reward *= _detection[0] + 0.01f;
-		if (spaceShip.goal)
+		if (dirDetection > 0.0f)
 		{
-			done = true;
-			reward = 1.0f;
+			if (boost)
+				reward += 0.5f;
 		}
-		else if (_detection[0] < 0.0f)
+		else if (dirDetection < 0.0f)
 		{
-			done = true;
-			reward = -1.0f;
+			if (boost)
+				reward -= 0.5f;
 		}
 
         Monitor.Log("Reward", reward, MonitorType.slider, Camera.main.transform);
