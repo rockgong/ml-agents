@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Text;
 
-public class TemplateAgent : Agent {
+public class RaceAgent : Agent {
 	public SpaceshipController spaceShip;
 	public RoadModelBuilder roadBuilder;
 	public Transform goalTrans;

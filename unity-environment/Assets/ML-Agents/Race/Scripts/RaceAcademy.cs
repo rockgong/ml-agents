@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TemplateAcademy : Academy {
+public class RaceAcademy : Academy {
 
 	public override void AcademyReset()
 	{

@@ -571,7 +571,7 @@ MonoBehaviour:
   spaceShip: {fileID: 1653672404}
   roadBuilder: {fileID: 794363540}
   goalTrans: {fileID: 1205672327}
-  roadLength: 90
+  roadLength: 500
   minRoadSegmentLength: 15
   maxRoadSegmentLength: 50
   minRoadRadius: 12
@@ -814,7 +814,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   followTarget: {fileID: 134311803}
-  followOffset: {x: 0, y: 100, z: -10}
+  followOffset: {x: 0, y: 300, z: -10}
 --- !u!114 &2071527054
 MonoBehaviour:
   m_ObjectHideFlags: 0
