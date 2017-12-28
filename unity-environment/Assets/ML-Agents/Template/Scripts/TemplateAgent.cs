@@ -35,12 +35,35 @@ public class TemplateAgent : Agent {
 			_currentDetection = new float[detectCount];
 		float pX = baseX;
 		float pY = baseY;
+		int detectGoal = -1;
+		bool detectOuter = false;
+
 		for (int i = 0; i < detectCount; i++)
 		{
-			roadBuilder.QueryProgress(pX, pY, (p, c) =>
+			if (detectGoal < 0)
 			{
-				_currentDetection[i] = (float)p / c;
-			});
+				if (!detectOuter)
+				{
+					Vector3 rayOrigin = new Vector3(pX, 0.0f, pY) + Vector3.up * 5.0f;
+					Vector3 rayDirection = Vector3.down;
+					RaycastHit hit = new RaycastHit();
+					if (Physics.Raycast(rayOrigin, rayDirection, out hit))
+					{
+						if (hit.collider.gameObject.tag == "Goal")
+							detectGoal = i;
+					}
+				}
+
+				roadBuilder.QueryProgress(pX, pY, (p, c) =>
+				{
+					_currentDetection[i] = (float)p / c;
+				});
+			}
+			else
+				_currentDetection[i] = 1.0f + (i - detectGoal) * 0.1f;
+
+			if (_currentDetection[i] < 0.0f)
+				detectOuter = true;
 			pX += forwardX * detectStep;
 			pY += forwardY * detectStep;
 		}
