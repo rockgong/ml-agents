@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class SpaceshipController : MonoBehaviour {
 	public ParticleSystem trailParticle;
+	public TrailRenderer trailRenderer;
 	public float accelerate;
 	public float dragRate;
 	public float maxAngularSpeed;
@@ -82,6 +83,11 @@ public class SpaceshipController : MonoBehaviour {
 	public float GetYaw()
 	{
 		return transform.eulerAngles.y;
+	}
+
+	public void Reset()
+	{
+		trailRenderer.Clear();
 	}
 
 	private void OnTriggerEnter(Collider other)

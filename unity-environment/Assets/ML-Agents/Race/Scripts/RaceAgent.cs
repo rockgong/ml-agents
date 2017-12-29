@@ -29,6 +29,7 @@ public class RaceAgent : Agent {
 	private float dirDetectionRight = 0.0f;
 
 	private float[] _currentDetection = null;
+	private int outOfRoadCounter = 0;
 
 	private void LoadAcademyParameter()
 	{
@@ -189,9 +190,15 @@ public class RaceAgent : Agent {
 		{
 			if (detection0 < 0.0f)
 			{
-				done = true;
-				reward = -1.0f;
+				outOfRoadCounter ++;
+				if (outOfRoadCounter >= 10)
+				{
+					done = true;
+					reward = -1.0f;
+				}
 			}
+			else
+				outOfRoadCounter = 0;
 		}
 
         Monitor.Log("Reward", reward, MonitorType.slider);
@@ -228,6 +235,7 @@ public class RaceAgent : Agent {
 		}
 
 		Camera.main.transform.position = new Vector3(0.0f, Camera.main.transform.position.y, 0.0f);
+		spaceShip.Reset();
 	}
 
 	public override void AgentOnDone()
