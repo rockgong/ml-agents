@@ -1,0 +1,10 @@
+{
+    "measure" : "reward",
+    "thresholds" : [0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6],
+    "min_lesson_length" : 2,
+    "signal_smoothing" : true, 
+    "parameters" : 
+    {
+        "road_width" : [8.0, 7.5, 7.0, 6.5, 6.0, 5.5, 5.0, 4.5, 4.0]
+    }
+}

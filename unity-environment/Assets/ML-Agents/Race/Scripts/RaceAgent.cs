@@ -7,6 +7,7 @@ public class RaceAgent : Agent {
 	public SpaceshipController spaceShip;
 	public RoadModelBuilder roadBuilder;
 	public Transform goalTrans;
+	public RaceAcademy raceAcademy;
 
 	public float roadLength = 100.0f;
 	public float minRoadSegmentLength = 10.0f;
@@ -28,6 +29,12 @@ public class RaceAgent : Agent {
 	private float dirDetectionRight = 0.0f;
 
 	private float[] _currentDetection = null;
+
+	private void LoadAcademyParameter()
+	{
+		if (raceAcademy != null)
+			roadBuilder.roadWidth = raceAcademy.roadWidth;
+	}
 
 	private float GetDirDetection(float baseX, float baseY, float forwardX, float forwardY)
 	{
@@ -187,6 +194,7 @@ public class RaceAgent : Agent {
 
 	public override void AgentReset()
 	{
+		LoadAcademyParameter();
 		if (spaceShip != null)
 		{
 			spaceShip.Boost(false);
@@ -206,6 +214,7 @@ public class RaceAgent : Agent {
 			{
 				goalTrans.position = new Vector3(x, 0.0f, y);
 				goalTrans.rotation = Quaternion.Euler(0.0f, -ga / Mathf.PI * 180.0f, 0.0f);
+				goalTrans.localScale = new Vector3(roadBuilder.roadWidth, 1.0f, goalTrans.localScale.z);
 			});
 		}
 	}
