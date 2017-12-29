@@ -185,8 +185,17 @@ public class RaceAgent : Agent {
 				reward -= 0.5f;
 		}
 
-        Monitor.Log("Reward", reward, MonitorType.slider, Camera.main.transform);
-        Monitor.Log("Action", string.Format("{0},{1}", act[0], act[1]), MonitorType.text, Camera.main.transform);
+		if (!done)
+		{
+			if (detection0 < 0.0f)
+			{
+				done = true;
+				reward = -1.0f;
+			}
+		}
+
+        Monitor.Log("Reward", reward, MonitorType.slider);
+        Monitor.Log("Action", string.Format("{0},{1}", act[0], act[1]), MonitorType.text);
 
 		processBlockLastStep = processBlock;
 
@@ -217,6 +226,8 @@ public class RaceAgent : Agent {
 				goalTrans.localScale = new Vector3(roadBuilder.roadWidth, 1.0f, goalTrans.localScale.z);
 			});
 		}
+
+		Camera.main.transform.position = new Vector3(0.0f, Camera.main.transform.position.y, 0.0f);
 	}
 
 	public override void AgentOnDone()
